@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Ooze.Query.Exceptions;
 using Ooze.Query.Tests.Integration.Setup;
 
 namespace Ooze.Query.Tests.Integration
@@ -24,14 +26,13 @@ namespace Ooze.Query.Tests.Integration
             var provider = scope.ServiceProvider;
 
             await using var context = _fixture.CreateContext();
-            //TODO fix
-            // var oozeResolver = provider.GetRequiredService<IOozeTypedResolver>();
-            //
-            // IQueryable<Post> query = context.Posts;
-            // query = oozeResolver.Query(query, queryDefinition);
-            //
-            // var results = await query.ToListAsync();
-            // Assert.True(results.Count == expectedRowCount);
+            var oozeResolver = provider.GetRequiredService<IOozeQueryHandler<Post>>();
+            
+             IQueryable<Post> query = context.Posts;
+             query = oozeResolver.Apply(query, queryDefinition);
+            
+             var results = await query.ToListAsync();
+             Assert.True(results.Count == expectedRowCount);
         }
         
         [Theory]
@@ -44,11 +45,10 @@ namespace Ooze.Query.Tests.Integration
             var provider = scope.ServiceProvider;
 
             await using var context = _fixture.CreateContext();
-            //TODO fix
-            // var oozeResolver = provider.GetRequiredService<IOozeTypedResolver>();
-            //
-            // IQueryable<Post> query = context.Posts;
-            // Assert.Throws<ExpressionCreatorException>(() => oozeResolver.Query(query, queryDefinition));
+            var oozeResolver = provider.GetRequiredService<IOozeQueryHandler<Post>>();
+            
+            IQueryable<Post> query = context.Posts;
+            Assert.Throws<ExpressionCreatorException>(() => oozeResolver.Apply(query, queryDefinition));
         }
     }
 }

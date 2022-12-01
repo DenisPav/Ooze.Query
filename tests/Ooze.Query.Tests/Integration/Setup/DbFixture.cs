@@ -1,6 +1,7 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Ooze.Query.Extensions;
 
 namespace Ooze.Query.Tests.Integration.Setup
 {
@@ -12,10 +13,8 @@ namespace Ooze.Query.Tests.Integration.Setup
             var services = new ServiceCollection()
                 .AddLogging();
 
-            //TODO: fix
-            // services.AddOozeTyped()
-            //     .AddQueryHandler()
-            //     .AddQueryFilter<TProvider1>();
+            services.AddOozeQuery()
+                .AddFilterProvider<TProvider1>();
 
             return services;
         }
