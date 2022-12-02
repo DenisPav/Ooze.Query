@@ -2,6 +2,11 @@
 This package enables usage of `Readable Queries` on `IQueryable<T>` instances. This is a concept where you can write actual
 expression as a string representation for filtering. For example if you have bunch of `Posts` which have `Id` and `Name` columns, you could filter them out via something like `Id >= '3' && Name != 'My Post'`. This in turn will be translated into the correct expression and applied to your `IQueryable` instance.
 
+## Installation ⚙
+First you'll need to install package from Github package repository. In order to do so follow directions on the official github documentation. You'll need to generate Github personal access token and add new nuget source in order to install package from github. More information can be found on the before mentioned page.
+
+## Working with Ooze.Query
+
 Supported logical operations for queries are AND (`&&`) and OR (`||`). On the other side of things supported value
 operators are next:
  * GreaterThan - `>>`
