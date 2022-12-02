@@ -1,0 +1,35 @@
+name: Create package
+
+on:
+  pull_request:
+    branches: [package]
+    types: [closed]
+
+jobs:
+  create_package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 7.0.x
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore
+      - name: Run tests
+        run: dotnet test ./tests/Ooze.Query.Tests/Ooze.Query.Tests.csproj
+      - name: Create packages
+        run: |
+          cd ./src/Ooze.Query
+          dotnet pack -c Release -o pkg
+      - name: Add nuget source
+        run: dotnet nuget add source https://nuget.pkg.github.com/DenisPav/index.json -u DenisPav -p ${OOZE_TOKEN} --store-password-in-clear-text
+        env:
+          OOZE_TOKEN: ${{ secrets.OozeToken }}
+      - name: Push package to GitHub registry
+        run: dotnet nuget push ./src/Ooze.Query/pkg/*.nupkg -k ${OOZE_TOKEN} -s https://nuget.pkg.github.com/DenisPav/index.json --skip-duplicate --no-symbols
+        env:
+          OOZE_TOKEN: ${{ secrets.OozeToken }}
