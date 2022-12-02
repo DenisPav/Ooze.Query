@@ -38,4 +38,17 @@ jobs:
           git config user.email "ooze@users.noreply.github.com"
           git add ./src/Ooze.Query/Ooze.Query.csproj
           git commit -m "Bump project version to ${{ steps.bump.outputs.newVersion }}"
+          git tag -a ${{ steps.bump.outputs.newVersion }} -m "Version ${{ steps.bump.outputs.newVersion }}"
           git push
+      - name: Create latest package
+        run: |
+          cd ./src/Ooze.Query
+          dotnet pack -c Release -o pkg
+      - name: Add nuget source
+        run: dotnet nuget add source https://nuget.pkg.github.com/DenisPav/index.json -u DenisPav -p ${OOZE_TOKEN} --store-password-in-clear-text
+        env:
+          OOZE_TOKEN: ${{ secrets.OozeToken }}
+      - name: Push package to GitHub registry
+        run: dotnet nuget push ./src/Ooze.Query/pkg/*.nupkg -k ${OOZE_TOKEN} -s https://nuget.pkg.github.com/DenisPav/index.json --skip-duplicate --no-symbols
+        env:
+          OOZE_TOKEN: ${{ secrets.OozeToken }}
